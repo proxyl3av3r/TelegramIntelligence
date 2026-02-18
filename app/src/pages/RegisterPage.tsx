@@ -9,6 +9,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export function RegisterPage() {
   const [username, setUsername] = useState('');
@@ -67,19 +68,22 @@ export function RegisterPage() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4 relative overflow-hidden">
       {/* Background Effects */}
-      <div className="absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[120px]" />
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent/10 rounded-full blur-[100px]" />
       </div>
 
-      {/* Back Button */}
-      <Link 
-        to="/"
-        className="absolute top-6 left-6 flex items-center gap-2 text-muted-foreground hover:text-white transition-colors"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        {t('nav.back')}
-      </Link>
+      {/* Top Bar */}
+      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-4">
+        <Link 
+          to="/"
+          className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          {t('nav.back')}
+        </Link>
+        <ThemeToggle />
+      </div>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -90,24 +94,24 @@ export function RegisterPage() {
         {/* Logo */}
         <div className="flex justify-center mb-8">
           <Link to="/" className="flex items-center gap-3">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-cyan-400 flex items-center justify-center">
-              <Radio className="w-7 h-7 text-white" />
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-cyan-400 flex items-center justify-center shadow-lg shadow-primary/30">
+              <Radio className="w-8 h-8 text-white" />
             </div>
           </Link>
         </div>
 
         {/* Form Card */}
-        <div className="glass rounded-3xl p-8">
+        <div className="glass rounded-3xl p-8 shadow-xl">
           <div className="text-center mb-8">
             <h1 className="text-2xl font-bold mb-2">{t('auth.register')}</h1>
             <p className="text-sm text-muted-foreground">
               {language === 'uk' 
-                ? 'Створіть акаунт для доступу до платформи'
-                : 'Create an account to access the platform'}
+                ? 'Створіть акаунт для доступу'
+                : 'Create an account to access'}
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {/* Username */}
             <div className="space-y-2">
               <Label htmlFor="username">{t('auth.username')}</Label>
@@ -160,7 +164,7 @@ export function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-white transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -209,12 +213,12 @@ export function RegisterPage() {
                   className="flex items-center gap-2"
                 >
                   {detectedRole === 'admin' ? (
-                    <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">
+                    <Badge className="bg-yellow-500/20 text-yellow-500 border-yellow-500/30">
                       <Shield className="w-3 h-3 mr-1" />
                       Admin
                     </Badge>
                   ) : (
-                    <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                    <Badge className="bg-green-500/20 text-green-500 border-green-500/30">
                       User
                     </Badge>
                   )}
@@ -231,7 +235,7 @@ export function RegisterPage() {
             {/* Submit */}
             <Button
               type="submit"
-              className="w-full bg-primary hover:bg-primary/90 text-white py-6 rounded-xl"
+              className="w-full bg-primary hover:bg-primary/90 text-white py-6 rounded-xl shadow-lg shadow-primary/30 mt-6"
               disabled={isLoading}
             >
               {isLoading ? (
@@ -255,7 +259,7 @@ export function RegisterPage() {
           {/* Login Link */}
           <p className="text-center text-sm text-muted-foreground">
             {t('auth.hasAccount')}{' '}
-            <Link to="/login" className="text-primary hover:underline">
+            <Link to="/login" className="text-primary hover:underline font-medium">
               {t('auth.login')}
             </Link>
           </p>

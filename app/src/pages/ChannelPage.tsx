@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, LogOut, Radio, Shield, FileText, Plus, Edit2, Trash2, Save } from 'lucide-react';
+import { ArrowLeft, LogOut, Radio, Shield, FileText, Plus, Edit2, Trash2, Save, ExternalLink, Phone, MapPin, Calendar, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -21,7 +21,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -33,6 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export function ChannelPage() {
   const { id } = useParams<{ id: string }>();
@@ -65,7 +65,7 @@ export function ChannelPage() {
       case 'red': return 'bg-red-500';
       case 'green': return 'bg-green-500';
       case 'purple': return 'bg-purple-500';
-      default: return 'bg-gray-500';
+      default: return 'bg-gray-400';
     }
   };
 
@@ -98,44 +98,51 @@ export function ChannelPage() {
       <header className="sticky top-0 z-50 glass border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <Link to="/channels" className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-cyan-400 flex items-center justify-center">
-                <Radio className="w-5 h-5 text-white" />
-              </div>
-              <span className="font-semibold hidden sm:block">{t('app.name')}</span>
-            </Link>
+            <div className="flex items-center gap-4">
+              <Link to="/channels" className="flex items-center gap-2">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-cyan-400 flex items-center justify-center">
+                  <Radio className="w-5 h-5 text-white" />
+                </div>
+                <span className="font-semibold hidden sm:block">{t('app.name')}</span>
+              </Link>
+            </div>
 
-            {isAdmin && (
-              <Button variant="ghost" onClick={() => navigate('/admin')} className="mr-2">
-                <Shield className="w-4 h-4 mr-2 text-yellow-400" />
-                {t('nav.admin')}
-              </Button>
-            )}
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center gap-2">
-                  <Avatar className="w-8 h-8">
-                    <AvatarImage src={user?.avatar} />
-                    <AvatarFallback>{user?.username?.[0]?.toUpperCase()}</AvatarFallback>
-                  </Avatar>
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              
+              {isAdmin && (
+                <Button variant="ghost" onClick={() => navigate('/admin')} className="hidden sm:flex text-yellow-500">
+                  <Shield className="w-4 h-4 mr-2" />
+                  {t('nav.admin')}
                 </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={handleLogout} className="text-destructive">
-                  <LogOut className="w-4 h-4 mr-2" />
-                  {t('nav.logout')}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+              )}
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="flex items-center gap-2">
+                    <Avatar className="w-8 h-8">
+                      <AvatarImage src={user?.avatar} />
+                      <AvatarFallback>{user?.username?.[0]?.toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={handleLogout} className="text-destructive">
+                    <LogOut className="w-4 h-4 mr-2" />
+                    {t('nav.logout')}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Main Content */}
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Back Button */}
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-6">
-          <Button variant="ghost" onClick={() => navigate('/channels')} className="gap-2">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-4">
+          <Button variant="ghost" onClick={() => navigate('/channels')} className="gap-2 -ml-2">
             <ArrowLeft className="w-4 h-4" />
             {t('nav.backToChannels')}
           </Button>
@@ -145,28 +152,25 @@ export function ChannelPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass rounded-3xl p-8 mb-8"
+          className="glass rounded-2xl p-6 mb-6"
         >
-          <div className="flex flex-col md:flex-row items-start gap-6">
+          <div className="flex flex-col sm:flex-row items-start gap-5">
             <div className="relative">
-              <Avatar className="w-24 h-24 rounded-2xl">
+              <Avatar className="w-20 h-20 rounded-xl">
                 <AvatarImage src={channel.avatar} />
-                <AvatarFallback className="text-3xl">{channel.name[0]}</AvatarFallback>
+                <AvatarFallback className="text-2xl">{channel.name[0]}</AvatarFallback>
               </Avatar>
               {channel.ratingColor && (
-                <div className={`absolute -top-2 -right-2 w-6 h-6 rounded-full ${getRatingColorClass(channel.ratingColor)} border-2 border-background`} />
+                <div className={`absolute -top-1 -right-1 w-5 h-5 rounded-full ${getRatingColorClass(channel.ratingColor)} border-2 border-background ring-2 ring-background`} />
               )}
             </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-3xl font-bold">{channel.name}</h1>
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-wrap items-center gap-2 mb-2">
+                <h1 className="text-2xl font-bold">{channel.name}</h1>
                 <Badge variant="secondary">{channel.category}</Badge>
-                {isAdmin && (
-                  <Button size="sm" variant="outline" onClick={() => navigate('/admin')}>
-                    <Edit2 className="w-3 h-3 mr-1" />
-                    {t('channel.edit')}
-                  </Button>
-                )}
+                <Badge variant="outline" className="text-xs">
+                  {channel.region === 'all' ? t('region.allUkraine') : t('region.kharkiv')}
+                </Badge>
               </div>
               <p className="text-muted-foreground mb-2">{channel.username}</p>
               <p className="text-foreground/80">{channel.description}</p>
@@ -175,21 +179,18 @@ export function ChannelPage() {
         </motion.div>
 
         {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <div className="flex items-center gap-2 flex-wrap">
-            <TabsList className="bg-secondary/50 flex-wrap h-auto">
+            <TabsList className="bg-secondary/50 h-auto flex-wrap">
               {channel.tabs.map((tab) => (
-                <TabsTrigger key={tab.id} value={tab.id} className="relative">
+                <TabsTrigger key={tab.id} value={tab.id} className="relative data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                   {tab.name}
-                  {isAdmin && editingTab === tab.id && (
-                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full" />
-                  )}
                 </TabsTrigger>
               ))}
             </TabsList>
             
             {isAdmin && (
-              <Button size="sm" variant="outline" onClick={() => setShowAddTabDialog(true)}>
+              <Button size="sm" variant="outline" onClick={() => setShowAddTabDialog(true)} className="rounded-full">
                 <Plus className="w-4 h-4 mr-1" />
                 {t('tab.addTab')}
               </Button>
@@ -197,7 +198,7 @@ export function ChannelPage() {
           </div>
 
           {channel.tabs.map((tab) => (
-            <TabsContent key={tab.id} value={tab.id}>
+            <TabsContent key={tab.id} value={tab.id} className="mt-4">
               {tab.type === 'owner' ? (
                 <OwnerTab 
                   content={tab.content as OwnerTabContent}
@@ -228,7 +229,6 @@ export function ChannelPage() {
         </Tabs>
       </main>
 
-      {/* Add Tab Dialog */}
       <AddTabDialog 
         open={showAddTabDialog} 
         onClose={() => setShowAddTabDialog(false)}
@@ -279,7 +279,11 @@ function OwnerTab({
 
   if (isEditing) {
     return (
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass rounded-2xl p-6 space-y-6">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass rounded-2xl p-6 space-y-5">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold">{language === 'uk' ? 'Редагування' : 'Editing'}</h3>
+        </div>
+
         {/* Photo */}
         <div className="space-y-2">
           <Label>{t('owner.photo')}</Label>
@@ -287,7 +291,7 @@ function OwnerTab({
             {editedContent.photo && (
               <img src={editedContent.photo} alt="" className="w-24 h-24 rounded-xl object-cover" />
             )}
-            <Input type="file" accept="image/*" onChange={handleImageUpload} />
+            <Input type="file" accept="image/*" onChange={handleImageUpload} className="max-w-xs" />
           </div>
         </div>
 
@@ -297,11 +301,12 @@ function OwnerTab({
           <Input 
             value={editedContent.fullName} 
             onChange={(e) => setEditedContent({ ...editedContent, fullName: e.target.value })} 
+            placeholder="Іванов Іван Іванович"
           />
         </div>
 
-        {/* Birth Date & Place */}
-        <div className="grid grid-cols-2 gap-4">
+        {/* Birth Info */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label>{t('owner.birthDate')}</Label>
             <Input 
@@ -315,17 +320,19 @@ function OwnerTab({
             <Input 
               value={editedContent.birthPlace} 
               onChange={(e) => setEditedContent({ ...editedContent, birthPlace: e.target.value })} 
+              placeholder="м. Київ"
             />
           </div>
         </div>
 
-        {/* Residence & Phone */}
-        <div className="grid grid-cols-2 gap-4">
+        {/* Contact Info */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label>{t('owner.residence')}</Label>
             <Input 
               value={editedContent.residence} 
               onChange={(e) => setEditedContent({ ...editedContent, residence: e.target.value })} 
+              placeholder="м. Харків"
             />
           </div>
           <div className="space-y-2">
@@ -333,6 +340,7 @@ function OwnerTab({
             <Input 
               value={editedContent.phone} 
               onChange={(e) => setEditedContent({ ...editedContent, phone: e.target.value })} 
+              placeholder="+380..."
             />
           </div>
         </div>
@@ -346,10 +354,11 @@ function OwnerTab({
               ...editedContent, 
               mediaActivity: { ...editedContent.mediaActivity, text: e.target.value }
             })} 
+            placeholder="Опис медіа активності..."
           />
           <div className="flex gap-2">
             <Input 
-              placeholder="URL посилання" 
+              placeholder="https://..." 
               value={newLink}
               onChange={(e) => setNewLink(e.target.value)}
             />
@@ -368,13 +377,6 @@ function OwnerTab({
               <Plus className="w-4 h-4" />
             </Button>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {editedContent.mediaActivity.links.map((link, i) => (
-              <a key={i} href={link} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
-                {link}
-              </a>
-            ))}
-          </div>
         </div>
 
         {/* Media Resources */}
@@ -389,7 +391,7 @@ function OwnerTab({
           />
           <div className="flex gap-2">
             <Input 
-              placeholder="URL посилання" 
+              placeholder="https://..." 
               value={newResourceLink}
               onChange={(e) => setNewResourceLink(e.target.value)}
             />
@@ -415,12 +417,13 @@ function OwnerTab({
           <Label>{t('owner.socialNetworks')}</Label>
           <div className="flex gap-2">
             <Input 
-              placeholder="Назва" 
+              placeholder="Facebook" 
               value={newSocialName}
               onChange={(e) => setNewSocialName(e.target.value)}
+              className="max-w-[150px]"
             />
             <Input 
-              placeholder="URL" 
+              placeholder="https://..." 
               value={newSocialUrl}
               onChange={(e) => setNewSocialUrl(e.target.value)}
             />
@@ -436,16 +439,6 @@ function OwnerTab({
             }}>
               <Plus className="w-4 h-4" />
             </Button>
-          </div>
-          <div className="space-y-2">
-            {editedContent.socialNetworks.map((social, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <span>{social.name}:</span>
-                <a href={social.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                  {social.url}
-                </a>
-              </div>
-            ))}
           </div>
         </div>
 
@@ -466,12 +459,12 @@ function OwnerTab({
             ) : (
               <span className="text-muted-foreground">{language === 'uk' ? 'Немає файлу' : 'No file'}</span>
             )}
-            <Input type="file" accept=".pdf" onChange={handlePdfUpload} className="w-auto" />
+            <Input type="file" accept=".pdf" onChange={handlePdfUpload} className="max-w-xs" />
           </div>
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end gap-3">
+        <div className="flex justify-end gap-3 pt-4 border-t border-border">
           <Button variant="outline" onClick={onCancel}>{t('channel.cancel')}</Button>
           <Button onClick={() => onSave(editedContent)}>
             <Save className="w-4 h-4 mr-2" />
@@ -483,9 +476,9 @@ function OwnerTab({
   }
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass rounded-2xl p-8">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
       {isAdmin && (
-        <div className="flex justify-end mb-4">
+        <div className="flex justify-end">
           <Button variant="outline" size="sm" onClick={onEdit}>
             <Edit2 className="w-4 h-4 mr-2" />
             {t('channel.edit')}
@@ -493,108 +486,128 @@ function OwnerTab({
         </div>
       )}
 
-      <div className="flex flex-col md:flex-row gap-8">
-        {/* Photo */}
-        {content.photo && (
-          <div className="w-48 h-48 rounded-2xl overflow-hidden flex-shrink-0">
-            <img src={content.photo} alt={content.fullName} className="w-full h-full object-cover" />
-          </div>
-        )}
-
-        {/* Info */}
-        <div className="flex-1 space-y-4">
-          {content.fullName && (
-            <div>
-              <span className="text-sm text-muted-foreground">{t('owner.fullName')}</span>
-              <p className="text-lg font-semibold">{content.fullName}</p>
+      <div className="glass rounded-2xl p-6">
+        <div className="flex flex-col md:flex-row gap-6">
+          {/* Photo */}
+          {content.photo && (
+            <div className="w-full md:w-48 h-48 rounded-xl overflow-hidden flex-shrink-0">
+              <img src={content.photo} alt={content.fullName} className="w-full h-full object-cover" />
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-4">
-            {content.birthDate && (
+          {/* Info */}
+          <div className="flex-1 space-y-4">
+            {content.fullName && (
               <div>
-                <span className="text-sm text-muted-foreground">{t('owner.birthDate')}</span>
-                <p>{content.birthDate}</p>
+                <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                  <User className="w-4 h-4" />
+                  <span className="text-sm">{t('owner.fullName')}</span>
+                </div>
+                <p className="text-xl font-semibold">{content.fullName}</p>
               </div>
             )}
-            {content.birthPlace && (
-              <div>
-                <span className="text-sm text-muted-foreground">{t('owner.birthPlace')}</span>
-                <p>{content.birthPlace}</p>
-              </div>
-            )}
-          </div>
 
-          {content.residence && (
-            <div>
-              <span className="text-sm text-muted-foreground">{t('owner.residence')}</span>
-              <p>{content.residence}</p>
-            </div>
-          )}
-
-          {content.phone && (
-            <div>
-              <span className="text-sm text-muted-foreground">{t('owner.phone')}</span>
-              <p>{content.phone}</p>
-            </div>
-          )}
-
-          {content.mediaActivity.text && (
-            <div>
-              <span className="text-sm text-muted-foreground">{t('owner.mediaActivity')}</span>
-              <p className="mt-1">{content.mediaActivity.text}</p>
-              {content.mediaActivity.links.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {content.mediaActivity.links.map((link, i) => (
-                    <a key={i} href={link} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
-                      {link}
-                    </a>
-                  ))}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {content.birthDate && (
+                <div>
+                  <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                    <Calendar className="w-4 h-4" />
+                    <span className="text-sm">{t('owner.birthDate')}</span>
+                  </div>
+                  <p>{content.birthDate}</p>
+                </div>
+              )}
+              {content.birthPlace && (
+                <div>
+                  <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                    <MapPin className="w-4 h-4" />
+                    <span className="text-sm">{t('owner.birthPlace')}</span>
+                  </div>
+                  <p>{content.birthPlace}</p>
                 </div>
               )}
             </div>
-          )}
 
-          {content.mediaResources.text && (
-            <div>
-              <span className="text-sm text-muted-foreground">{t('owner.mediaResources')}</span>
-              <p className="mt-1">{content.mediaResources.text}</p>
-            </div>
-          )}
-
-          {content.socialNetworks.length > 0 && (
-            <div>
-              <span className="text-sm text-muted-foreground">{t('owner.socialNetworks')}</span>
-              <div className="flex flex-wrap gap-3 mt-2">
-                {content.socialNetworks.map((social, i) => (
-                  <a 
-                    key={i} 
-                    href={social.url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="px-3 py-1 bg-secondary rounded-lg text-sm hover:bg-secondary/80"
-                  >
-                    {social.name}
-                  </a>
-                ))}
+            {content.residence && (
+              <div>
+                <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                  <MapPin className="w-4 h-4" />
+                  <span className="text-sm">{t('owner.residence')}</span>
+                </div>
+                <p>{content.residence}</p>
               </div>
-            </div>
-          )}
+            )}
 
-          {content.dossierFile && (
-            <div>
-              <span className="text-sm text-muted-foreground">{t('owner.dossier')}</span>
-              <a 
-                href={content.dossierFile}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 mt-2 text-primary hover:underline"
-              >
-                <FileText className="w-5 h-5" />
-                PDF Document
-              </a>
-            </div>
-          )}
+            {content.phone && (
+              <div>
+                <div className="flex items-center gap-2 text-muted-foreground mb-1">
+                  <Phone className="w-4 h-4" />
+                  <span className="text-sm">{t('owner.phone')}</span>
+                </div>
+                <p>{content.phone}</p>
+              </div>
+            )}
+
+            {content.mediaActivity.text && (
+              <div className="pt-4 border-t border-border">
+                <span className="text-sm text-muted-foreground block mb-2">{t('owner.mediaActivity')}</span>
+                <p className="text-foreground/80">{content.mediaActivity.text}</p>
+                {content.mediaActivity.links.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {content.mediaActivity.links.map((link, i) => (
+                      <a key={i} href={link} target="_blank" rel="noopener noreferrer" 
+                        className="inline-flex items-center gap-1 text-sm text-primary hover:underline bg-primary/10 px-3 py-1 rounded-full">
+                        <ExternalLink className="w-3 h-3" />
+                        {link.substring(0, 30)}...
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {content.mediaResources.text && (
+              <div className="pt-4 border-t border-border">
+                <span className="text-sm text-muted-foreground block mb-2">{t('owner.mediaResources')}</span>
+                <p className="text-foreground/80">{content.mediaResources.text}</p>
+              </div>
+            )}
+
+            {content.socialNetworks.length > 0 && (
+              <div className="pt-4 border-t border-border">
+                <span className="text-sm text-muted-foreground block mb-2">{t('owner.socialNetworks')}</span>
+                <div className="flex flex-wrap gap-2">
+                  {content.socialNetworks.map((social, i) => (
+                    <a 
+                      key={i} 
+                      href={social.url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-secondary rounded-lg text-sm hover:bg-secondary/80 transition-colors"
+                    >
+                      <ExternalLink className="w-3 h-3" />
+                      {social.name}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {content.dossierFile && (
+              <div className="pt-4 border-t border-border">
+                <span className="text-sm text-muted-foreground block mb-2">{t('owner.dossier')}</span>
+                <a 
+                  href={content.dossierFile}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
+                >
+                  <FileText className="w-5 h-5" />
+                  {language === 'uk' ? 'Відкрити PDF' : 'Open PDF'}
+                </a>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </motion.div>
@@ -647,15 +660,15 @@ function OverviewTab({
 
   if (isEditing) {
     return (
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
         {editedContent.blocks.map((block) => (
-          <div key={block.id} className="glass rounded-2xl p-6 space-y-4">
-            <div className="flex justify-between items-start">
+          <div key={block.id} className="glass rounded-xl p-5 space-y-3">
+            <div className="flex justify-between items-start gap-2">
               <Input
                 placeholder={t('overview.blockTitle')}
                 value={block.title}
                 onChange={(e) => updateBlock(block.id, { title: e.target.value })}
-                className="font-semibold text-lg"
+                className="font-semibold text-lg flex-1"
               />
               <Button variant="ghost" size="sm" onClick={() => deleteBlock(block.id)} className="text-destructive">
                 <Trash2 className="w-4 h-4" />
@@ -672,7 +685,7 @@ function OverviewTab({
                 type="file"
                 accept="image/*"
                 onChange={(e) => e.target.files?.[0] && handleImageUpload(block.id, e.target.files[0])}
-                className="mb-2"
+                className="mb-2 max-w-xs"
               />
               <div className="flex flex-wrap gap-2">
                 {block.images.map((img, i) => (
@@ -683,12 +696,12 @@ function OverviewTab({
           </div>
         ))}
 
-        <Button onClick={addBlock} variant="outline" className="w-full">
-          <Plus className="w-4 h-4 mr-2" />
+        <Button onClick={addBlock} variant="outline" className="w-full py-6 border-dashed">
+          <Plus className="w-5 h-5 mr-2" />
           {t('overview.addBlock')}
         </Button>
 
-        <div className="flex justify-end gap-3">
+        <div className="flex justify-end gap-3 pt-4">
           <Button variant="outline" onClick={onCancel}>{t('channel.cancel')}</Button>
           <Button onClick={() => onSave(editedContent)}>
             <Save className="w-4 h-4 mr-2" />
@@ -700,7 +713,7 @@ function OverviewTab({
   }
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
       {isAdmin && (
         <div className="flex justify-end">
           <Button variant="outline" size="sm" onClick={onEdit}>
@@ -711,13 +724,13 @@ function OverviewTab({
       )}
 
       {content.blocks.map((block) => (
-        <div key={block.id} className="glass rounded-2xl p-6">
-          {block.title && <h3 className="text-xl font-semibold mb-4">{block.title}</h3>}
-          <p className="text-foreground/80 whitespace-pre-wrap">{block.content}</p>
+        <div key={block.id} className="glass rounded-xl p-6">
+          {block.title && <h3 className="text-xl font-semibold mb-3">{block.title}</h3>}
+          <p className="text-foreground/80 whitespace-pre-wrap leading-relaxed">{block.content}</p>
           {block.images.length > 0 && (
-            <div className="flex flex-wrap gap-4 mt-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
               {block.images.map((img, i) => (
-                <img key={i} src={img} alt="" className="max-w-xs rounded-lg" />
+                <img key={i} src={img} alt="" className="rounded-lg object-cover w-full h-48" />
               ))}
             </div>
           )}
@@ -725,7 +738,7 @@ function OverviewTab({
       ))}
 
       {content.blocks.length === 0 && (
-        <div className="text-center py-12 text-muted-foreground">
+        <div className="text-center py-12 text-muted-foreground glass rounded-xl">
           {language === 'uk' ? 'Немає контенту' : 'No content'}
         </div>
       )}
@@ -758,17 +771,14 @@ function AddTabDialog({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="bg-card border-border">
+      <DialogContent className="bg-card border-border max-w-md">
         <DialogHeader>
           <DialogTitle>{t('tab.addTab')}</DialogTitle>
-          <DialogDescription>
-            {language === 'uk' ? 'Створіть нову вкладку для каналу' : 'Create a new tab for the channel'}
-          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label>{language === 'uk' ? 'Назва вкладки' : 'Tab name'}</Label>
-            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Owner" />
+            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={language === 'uk' ? 'Наприклад: Власник' : 'e.g. Owner'} />
           </div>
           <div className="space-y-2">
             <Label>{t('tab.template')}</Label>

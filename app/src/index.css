@@ -4,6 +4,31 @@
 
 @layer base {
   :root {
+    /* Light theme (default) */
+    --background: 0 0% 100%;
+    --foreground: 220 20% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 10%;
+    --primary: 199 89% 48%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 220 20% 10%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 10% 45%;
+    --accent: 199 89% 48%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 199 89% 48%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    /* Dark theme */
     --background: 220 20% 4%;
     --foreground: 0 0% 98%;
     --card: 220 15% 8%;
@@ -34,6 +59,7 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 }
 
@@ -56,29 +82,69 @@
   background: hsl(var(--muted-foreground));
 }
 
-/* Glass effect */
+/* Glass effect - works for both themes */
 .glass {
-  background: rgba(15, 20, 30, 0.7);
+  background: hsl(var(--card) / 0.7);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  border: 1px solid hsl(var(--border));
+}
+
+.dark .glass {
+  background: rgba(15, 20, 30, 0.7);
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 /* Glow effects */
 .glow-primary {
-  box-shadow: 0 0 40px rgba(14, 165, 233, 0.3);
+  box-shadow: 0 0 40px hsl(var(--primary) / 0.3);
 }
 
 .glow-text {
-  text-shadow: 0 0 40px rgba(14, 165, 233, 0.5);
+  text-shadow: 0 0 40px hsl(var(--primary) / 0.5);
 }
 
 /* Gradient text */
 .gradient-text {
-  background: linear-gradient(135deg, #0ea5e9 0%, #22d3ee 50%, #0ea5e9 100%);
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, #22d3ee 50%, hsl(var(--primary)) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* Rating color filters */
+.rating-filter-red {
+  @apply bg-red-500 text-white border-red-500;
+}
+
+.rating-filter-green {
+  @apply bg-green-500 text-white border-green-500;
+}
+
+.rating-filter-purple {
+  @apply bg-purple-500 text-white border-purple-500;
+}
+
+.rating-dot-red {
+  @apply bg-red-500;
+}
+
+.rating-dot-green {
+  @apply bg-green-500;
+}
+
+.rating-dot-purple {
+  @apply bg-purple-500;
+}
+
+/* Theme toggle animation */
+.theme-toggle-icon {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* Smooth transitions for theme switching */
+* {
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 /* Animations */
@@ -107,4 +173,85 @@
 
 .animate-slide-up {
   animation: slide-up 0.5s ease-out forwards;
+}
+
+/* Card hover effects */
+.card-hover {
+  @apply transition-all duration-300;
+}
+
+.card-hover:hover {
+  @apply shadow-lg;
+  transform: translateY(-2px);
+}
+
+.dark .card-hover:hover {
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+}
+
+/* Button press effect */
+.btn-press:active {
+  transform: scale(0.98);
+}
+
+/* Focus styles */
+.focus-ring:focus-visible {
+  @apply outline-none ring-2 ring-primary ring-offset-2;
+}
+
+/* Rating badge styles */
+.rating-badge {
+  @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium;
+}
+
+/* Channel card improvements */
+.channel-card {
+  @apply relative overflow-hidden;
+}
+
+.channel-card::before {
+  content: '';
+  @apply absolute top-0 left-0 w-1 h-full transition-all duration-300;
+}
+
+.channel-card:hover::before {
+  @apply w-1.5;
+}
+
+/* Tab styles */
+.tab-active {
+  @apply bg-primary text-primary-foreground;
+}
+
+.tab-inactive {
+  @apply bg-secondary text-secondary-foreground hover:bg-secondary/80;
+}
+
+/* Form input improvements */
+.input-improved {
+  @apply transition-all duration-200;
+}
+
+.input-improved:focus {
+  @apply ring-2 ring-primary/50;
+}
+
+/* Loading skeleton */
+.skeleton {
+  @apply animate-pulse bg-muted rounded;
+}
+
+/* Empty state */
+.empty-state {
+  @apply flex flex-col items-center justify-center py-16 text-center;
+}
+
+/* Filter section */
+.filter-section {
+  @apply flex flex-wrap gap-2 items-center p-4 rounded-xl bg-secondary/50;
+}
+
+/* Stats card */
+.stats-card {
+  @apply p-6 rounded-2xl bg-gradient-to-br from-primary/10 to-transparent border border-primary/20;
 }

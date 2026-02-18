@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export function LoginPage() {
   const [email, setEmail] = useState('');
@@ -40,19 +41,22 @@ export function LoginPage() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4 relative overflow-hidden">
       {/* Background Effects */}
-      <div className="absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[120px]" />
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent/10 rounded-full blur-[100px]" />
       </div>
 
-      {/* Back Button */}
-      <Link 
-        to="/"
-        className="absolute top-6 left-6 flex items-center gap-2 text-muted-foreground hover:text-white transition-colors"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        {t('nav.back')}
-      </Link>
+      {/* Top Bar */}
+      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-4">
+        <Link 
+          to="/"
+          className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          {t('nav.back')}
+        </Link>
+        <ThemeToggle />
+      </div>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -63,20 +67,20 @@ export function LoginPage() {
         {/* Logo */}
         <div className="flex justify-center mb-8">
           <Link to="/" className="flex items-center gap-3">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-cyan-400 flex items-center justify-center">
-              <Radio className="w-7 h-7 text-white" />
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-cyan-400 flex items-center justify-center shadow-lg shadow-primary/30">
+              <Radio className="w-8 h-8 text-white" />
             </div>
           </Link>
         </div>
 
         {/* Form Card */}
-        <div className="glass rounded-3xl p-8">
+        <div className="glass rounded-3xl p-8 shadow-xl">
           <div className="text-center mb-8">
             <h1 className="text-2xl font-bold mb-2">{t('auth.login')}</h1>
             <p className="text-sm text-muted-foreground">
               {language === 'uk' 
-                ? 'Введіть свої дані для доступу до платформи'
-                : 'Enter your credentials to access the platform'}
+                ? 'Введіть свої дані для доступу'
+                : 'Enter your credentials to access'}
             </p>
           </div>
 
@@ -115,7 +119,7 @@ export function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-white transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -125,7 +129,7 @@ export function LoginPage() {
             {/* Submit */}
             <Button
               type="submit"
-              className="w-full bg-primary hover:bg-primary/90 text-white py-6 rounded-xl"
+              className="w-full bg-primary hover:bg-primary/90 text-white py-6 rounded-xl shadow-lg shadow-primary/30"
               disabled={isLoading}
             >
               {isLoading ? (
@@ -149,16 +153,11 @@ export function LoginPage() {
           {/* Register Link */}
           <p className="text-center text-sm text-muted-foreground">
             {t('auth.noAccount')}{' '}
-            <Link to="/register" className="text-primary hover:underline">
+            <Link to="/register" className="text-primary hover:underline font-medium">
               {t('auth.register')}
             </Link>
           </p>
         </div>
-
-        {/* Security Note */}
-        <p className="text-center text-xs text-muted-foreground/60 mt-6">
-          {t('auth.securityNote')}
-        </p>
       </motion.div>
     </div>
   );

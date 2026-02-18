@@ -1,22 +1,10 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  ArrowLeft, 
-  Plus, 
-  Edit2, 
-  Trash2, 
-  LogOut,
-  Radio,
-  Settings,
-  Database,
-  Search,
-  Shield
-} from 'lucide-react';
+import { ArrowLeft, Plus, Edit2, Trash2, LogOut, Radio, Database, Search, Shield, X, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
 import { useData, type RatingColor } from '@/contexts/DataContext';
-import type { Channel } from '@/contexts/DataContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -53,12 +41,15 @@ import {
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import type { Channel } from '@/contexts/DataContext';
 
 const categories = ['Новини', 'Політика', 'Економіка', 'Розваги', 'Спорт', 'Культура', 'Технології'];
-const ratingColors: { value: RatingColor; label: string }[] = [
-  { value: 'red', label: 'Червоний' },
-  { value: 'green', label: 'Зелений' },
-  { value: 'purple', label: 'Фіолетовий' },
+
+const ratingColors: { value: RatingColor; labelUk: string; labelEn: string; colorClass: string }[] = [
+  { value: 'red', labelUk: 'Червоний', labelEn: 'Red', colorClass: 'bg-red-500' },
+  { value: 'green', labelUk: 'Зелений', labelEn: 'Green', colorClass: 'bg-green-500' },
+  { value: 'purple', labelUk: 'Фіолетовий', labelEn: 'Purple', colorClass: 'bg-purple-500' },
 ];
 
 export function AdminPage() {
@@ -69,7 +60,7 @@ export function AdminPage() {
   
   const [searchQuery, setSearchQuery] = useState('');
   const [showChannelForm, setShowChannelForm] = useState(false);
-  const [editingChannel, setEditingChannel] = useState<typeof channels[0] | null>(null);
+  const [editingChannel, setEditingChannel] = useState<Channel | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleteId, setDeleteId] = useState<string>('');
 
@@ -114,35 +105,36 @@ export function AdminPage() {
             </Link>
 
             <div className="flex items-center gap-2">
-              <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">
+              <Badge className="bg-yellow-500/20 text-yellow-500 border-yellow-500/30">
                 <Shield className="w-3 h-3 mr-1" />
                 Admin
               </Badge>
+              <ThemeToggle />
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="flex items-center gap-2">
+                    <Avatar className="w-8 h-8">
+                      <AvatarImage src={user?.avatar} />
+                      <AvatarFallback>{user?.username?.[0]?.toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={handleLogout} className="text-destructive">
+                    <LogOut className="w-4 h-4 mr-2" />
+                    {t('nav.logout')}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center gap-2">
-                  <Avatar className="w-8 h-8">
-                    <AvatarImage src={user?.avatar} />
-                    <AvatarFallback>{user?.username?.[0]?.toUpperCase()}</AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={handleLogout} className="text-destructive">
-                  <LogOut className="w-4 h-4 mr-2" />
-                  {t('nav.logout')}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-6">
-          <Button variant="ghost" onClick={() => navigate('/channels')} className="gap-2">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-4">
+          <Button variant="ghost" onClick={() => navigate('/channels')} className="gap-2 -ml-2">
             <ArrowLeft className="w-4 h-4" />
             {t('nav.backToChannels')}
           </Button>
@@ -150,73 +142,115 @@ export function AdminPage() {
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <Settings className="w-8 h-8 text-primary" />
-            <h1 className="text-3xl font-bold">{t('admin.title')}</h1>
-          </div>
-          <p className="text-muted-foreground">{t('admin.description')}</p>
-        </motion.div>
-
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-          className="grid grid-cols-3 gap-6 mb-8"
-        >
-          <div className="glass rounded-2xl p-6">
-            <div className="flex items-center gap-3 mb-2">
-              <Database className="w-5 h-5 text-primary" />
-              <span className="text-sm text-muted-foreground">{t('admin.channels')}</span>
+            <div className="w-10 h-10 rounded-xl bg-yellow-500/20 flex items-center justify-center">
+              <Shield className="w-5 h-5 text-yellow-500" />
             </div>
-            <div className="text-3xl font-bold">{channels.length}</div>
+            <div>
+              <h1 className="text-2xl font-bold">{t('admin.title')}</h1>
+              <p className="text-sm text-muted-foreground">{t('admin.description')}</p>
+            </div>
           </div>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-6">
-          <div className="relative max-w-md">
+        {/* Stats */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }} 
+          animate={{ opacity: 1, y: 0 }} 
+          transition={{ delay: 0.1 }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
+        >
+          <div className="glass rounded-xl p-4 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Database className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <div className="text-2xl font-bold">{channels.length}</div>
+              <div className="text-xs text-muted-foreground">{t('admin.channels')}</div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Search and Add */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }} 
+          animate={{ opacity: 1, y: 0 }} 
+          transition={{ delay: 0.2 }}
+          className="flex flex-col sm:flex-row gap-4 mb-6"
+        >
+          <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               placeholder={t('filter.search')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-secondary/50 border-border"
+              className="pl-10"
             />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </div>
-        </motion.div>
-
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold">{t('admin.channels')}</h2>
-          <Button onClick={() => { setEditingChannel(null); setShowChannelForm(true); }}>
+          <Button onClick={() => { setEditingChannel(null); setShowChannelForm(true); }} className="flex-shrink-0">
             <Plus className="w-4 h-4 mr-2" />
             {t('admin.addChannel')}
           </Button>
-        </div>
+        </motion.div>
 
+        {/* Channels List */}
         <div className="space-y-3">
-          {filteredChannels.map((channel) => (
-            <div key={channel.id} className="glass rounded-xl p-4 flex items-center gap-4">
-              <Avatar className="w-12 h-12 rounded-xl">
-                <AvatarImage src={channel.avatar} />
-                <AvatarFallback>{channel.name[0]}</AvatarFallback>
-              </Avatar>
+          {filteredChannels.map((channel, index) => (
+            <motion.div
+              key={channel.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
+              className="glass rounded-xl p-4 flex items-center gap-4 group"
+            >
+              <div className="relative">
+                <Avatar className="w-12 h-12 rounded-lg">
+                  <AvatarImage src={channel.avatar} />
+                  <AvatarFallback>{channel.name[0]}</AvatarFallback>
+                </Avatar>
+                {channel.ratingColor && (
+                  <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-background ${
+                    channel.ratingColor === 'red' ? 'bg-red-500' :
+                    channel.ratingColor === 'green' ? 'bg-green-500' : 'bg-purple-500'
+                  }`} />
+                )}
+              </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <h3 className="font-semibold truncate">{channel.name}</h3>
                   <Badge variant="secondary" className="text-xs">{channel.category}</Badge>
-                  {channel.ratingColor && (
-                    <div className={`w-3 h-3 rounded-full ${
-                      channel.ratingColor === 'red' ? 'bg-red-500' : 
-                      channel.ratingColor === 'green' ? 'bg-green-500' : 'bg-purple-500'
-                    }`} />
-                  )}
+                  <Badge variant="outline" className="text-xs">
+                    {channel.region === 'all' ? t('region.allUkraine') : t('region.kharkiv')}
+                  </Badge>
                 </div>
                 <p className="text-sm text-muted-foreground">{channel.username}</p>
               </div>
-              <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon" onClick={() => { setEditingChannel(channel); setShowChannelForm(true); }}>
+              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={() => { setEditingChannel(channel); setShowChannelForm(true); }}
+                  className="text-muted-foreground hover:text-foreground"
+                >
                   <Edit2 className="w-4 h-4" />
                 </Button>
-                <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(channel.id)}>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="text-destructive"
+                  onClick={() => handleDelete(channel.id)}
+                >
                   <Trash2 className="w-4 h-4" />
                 </Button>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
 
@@ -312,34 +346,39 @@ function ChannelFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl bg-card border-border">
+      <DialogContent className="max-w-lg bg-card border-border max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{channel ? (language === 'uk' ? 'Редагувати канал' : 'Edit channel') : (language === 'uk' ? 'Додати канал' : 'Add channel')}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Avatar */}
           <div className="flex items-center gap-4">
-            <div className="w-24 h-24 rounded-xl bg-secondary flex items-center justify-center overflow-hidden">
-              {previewImage ? <img src={previewImage} alt="" className="w-full h-full object-cover" /> : <span className="text-muted-foreground">No image</span>}
+            <div className="w-20 h-20 rounded-xl bg-secondary flex items-center justify-center overflow-hidden">
+              {previewImage ? <img src={previewImage} alt="" className="w-full h-full object-cover" /> : <span className="text-muted-foreground text-sm">No image</span>}
             </div>
-            <Input type="file" accept="image/*" onChange={handleImageChange} />
+            <Input type="file" accept="image/*" onChange={handleImageChange} className="max-w-[200px]" />
           </div>
 
+          {/* Name */}
           <div className="space-y-2">
             <Label>{language === 'uk' ? 'Назва каналу' : 'Channel name'}</Label>
             <Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
           </div>
 
+          {/* Username */}
           <div className="space-y-2">
             <Label>Username</Label>
             <Input value={formData.username} onChange={(e) => setFormData({ ...formData, username: e.target.value })} placeholder="@channel" required />
           </div>
 
+          {/* Description */}
           <div className="space-y-2">
             <Label>{language === 'uk' ? 'Опис' : 'Description'}</Label>
-            <Textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
+            <Textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} />
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
+          {/* Category, Region, Rating */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label>{language === 'uk' ? 'Категорія' : 'Category'}</Label>
               <Select value={formData.category} onValueChange={(v) => setFormData({ ...formData, category: v })}>
@@ -367,15 +406,25 @@ function ChannelFormDialog({
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">{language === 'uk' ? 'Без кольору' : 'No color'}</SelectItem>
-                  {ratingColors.map((c) => <SelectItem key={c.value} value={c.value!}>{c.label}</SelectItem>)}
+                  {ratingColors.map((c) => (
+                    <SelectItem key={c.value} value={c.value!}>
+                      <span className="flex items-center gap-2">
+                        <span className={`w-3 h-3 rounded-full ${c.colorClass}`} />
+                        {language === 'uk' ? c.labelUk : c.labelEn}
+                      </span>
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
           </div>
 
-          <div className="flex justify-end gap-3">
-            <Button variant="outline" onClick={onClose}>{language === 'uk' ? 'Скасувати' : 'Cancel'}</Button>
-            <Button type="submit" disabled={isLoading}>{language === 'uk' ? 'Зберегти' : 'Save'}</Button>
+          {/* Actions */}
+          <div className="flex justify-end gap-3 pt-4">
+            <Button variant="outline" onClick={onClose} type="button">{language === 'uk' ? 'Скасувати' : 'Cancel'}</Button>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? (language === 'uk' ? 'Збереження...' : 'Saving...') : <><Save className="w-4 h-4 mr-2" />{language === 'uk' ? 'Зберегти' : 'Save'}</>}
+            </Button>
           </div>
         </form>
       </DialogContent>
