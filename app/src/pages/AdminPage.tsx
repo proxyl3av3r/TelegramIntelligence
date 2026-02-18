@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Plus, Edit2, Trash2, LogOut, Radio, Database, Search, Shield, X, Save } from 'lucide-react';
+import { ArrowLeft, Plus, Edit2, Trash2, LogOut, Radio, Database, Search, Shield, X, Save, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
@@ -54,7 +54,7 @@ const ratingColors: { value: RatingColor; labelUk: string; labelEn: string; colo
 
 export function AdminPage() {
   const { user, logout, isAdmin } = useAuth();
-  const { channels, deleteChannel } = useData();
+  const { channels, deleteChannel, fetchChannels, isLoading } = useData();
   const { t, language } = useLanguage();
   const navigate = useNavigate();
   
@@ -63,6 +63,11 @@ export function AdminPage() {
   const [editingChannel, setEditingChannel] = useState<Channel | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleteId, setDeleteId] = useState<string>('');
+
+  // Fetch channels on mount
+  useEffect(() => {
+    fetchChannels();
+  }, [fetchChannels]);
 
   if (!isAdmin) {
     navigate('/channels');
@@ -200,7 +205,15 @@ export function AdminPage() {
           </Button>
         </motion.div>
 
+        {/* Loading State */}
+        {isLoading && (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-10 h-10 animate-spin text-primary" />
+          </div>
+        )}
+
         {/* Channels List */}
+        {!isLoading && (
         <div className="space-y-3">
           {filteredChannels.map((channel, index) => (
             <motion.div
@@ -259,6 +272,8 @@ export function AdminPage() {
             <Database className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <p className="text-muted-foreground">{language === 'uk' ? 'Канали не знайдено' : 'No channels found'}</p>
           </div>
+        )}
+        </div>
         )}
       </main>
 

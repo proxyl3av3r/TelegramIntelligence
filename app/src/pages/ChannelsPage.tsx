@@ -1,6 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, LogOut, Radio, Shield, Globe, MapPin, Filter, X } from 'lucide-react';
+import { Search, LogOut, Radio, Shield, Globe, MapPin, Filter, X, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
@@ -38,9 +38,14 @@ export function ChannelsPage() {
   const [showFilters, setShowFilters] = useState(false);
   
   const { user, logout, isAdmin } = useAuth();
-  const { channels } = useData();
+  const { channels, fetchChannels, isLoading } = useData();
   const { t, language } = useLanguage();
   const navigate = useNavigate();
+
+  // Fetch channels on mount
+  useEffect(() => {
+    fetchChannels();
+  }, [fetchChannels]);
 
   const filteredChannels = useMemo(() => {
     return channels.filter((channel) => {
@@ -312,7 +317,15 @@ export function ChannelsPage() {
           </p>
         </div>
 
+        {/* Loading State */}
+        {isLoading && (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-10 h-10 animate-spin text-primary" />
+          </div>
+        )}
+
         {/* Channels Grid */}
+        {!isLoading && (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {filteredChannels.map((channel, index) => (
             <motion.div
@@ -367,8 +380,10 @@ export function ChannelsPage() {
             </motion.div>
           ))}
         </div>
+        )}
 
         {/* Empty State */}
+        {!isLoading && filteredChannels.length === 0 && (
         {filteredChannels.length === 0 && (
           <motion.div
             initial={{ opacity: 0 }}
